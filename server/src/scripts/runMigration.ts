@@ -50,7 +50,7 @@ async function runMigrations() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'apikey': serviceRoleKey,
+          'apikey': serviceRoleKey as string,
           'Authorization': `Bearer ${serviceRoleKey}`
         },
         body: JSON.stringify({ query: sqlContent })
