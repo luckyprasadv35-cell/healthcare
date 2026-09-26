@@ -4,8 +4,8 @@ import { AIPlan, AIPlanSchema } from '../schemas/planSchema';
 
 export async function generatePlan(profileData: ProfileInput, progressLogs: any[] = []): Promise<AIPlan> {
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey || apiKey === 'your_google_gemini_api_key') {
-    throw new Error('GEMINI_API_KEY is not configured in server environment variables.');
+  if (!apiKey || apiKey.includes('your_google_gemini_api_key') || apiKey.includes('YOUR_GEMINI')) {
+    throw new Error('GEMINI_API_KEY is missing or invalid in Render environment variables. Please add a valid Google Gemini API Key.');
   }
 
   const ai = new GoogleGenAI({ apiKey });

@@ -23,7 +23,9 @@ async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error || errorData.message || `API Error: ${response.statusText}`);
+    const errorMessage = errorData.error || errorData.message || `API Error: ${response.statusText}`;
+    const details = errorData.details ? ` (${errorData.details})` : '';
+    throw new Error(errorMessage + details);
   }
 
   return response.json();
