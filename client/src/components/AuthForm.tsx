@@ -77,7 +77,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSubmit }) => {
               className="w-full bg-gray-950 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
               placeholder="••••••••"
             />
-            {errors.confirmPassword && <p className="text-red-400 text-xs mt-1">{String(errors.confirmPassword.message)}</p>}
+            {(errors as any).confirmPassword && <p className="text-red-400 text-xs mt-1">{String((errors as any).confirmPassword.message)}</p>}
           </div>
         )}
 
