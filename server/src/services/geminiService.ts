@@ -78,7 +78,7 @@ Return ONLY a JSON object matching this exact structure:
         : `${userPrompt}\n\nIMPORTANT: Your previous output failed Zod schema validation. You MUST produce a JSON object with 'macros', 'workout_plan' (array of 7 days), and 'nutrition_plan' (array of 7 days). No markdown, no explanations outside JSON.`;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.8-flash',
         contents: prompt,
         config: {
           systemInstruction,
