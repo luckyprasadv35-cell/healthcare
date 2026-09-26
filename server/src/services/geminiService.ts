@@ -111,5 +111,36 @@ Return ONLY a JSON object matching this exact structure:
     }
   }
 
-  throw new Error(`All AI model attempts failed. ${lastError?.message || ''}`);
+  // If all AI models fail, return a generic fallback plan to prevent the app from crashing
+  console.warn(`All AI model attempts failed. Returning fallback plan. Last error: ${lastError?.message || ''}`);
+  
+  return {
+    macros: {
+      daily_calories: 2200,
+      protein_g: 150,
+      carbs_g: 220,
+      fats_g: 70
+    },
+    workout_plan: Array.from({ length: 7 }, (_, i) => ({
+      day: i + 1,
+      focus: i % 2 === 0 ? "Full Body Strength" : "Active Recovery / Cardio",
+      exercises: i % 2 === 0 ? [
+        { name: "Squats", sets: 3, reps: "10-12", rest_sec: 60 },
+        { name: "Push-ups", sets: 3, reps: "10-15", rest_sec: 60 },
+        { name: "Dumbbell Rows", sets: 3, reps: "10-12", rest_sec: 60 }
+      ] : [
+        { name: "Light Jogging or Walking", sets: 1, reps: "30 mins", rest_sec: 0 },
+        { name: "Stretching", sets: 1, reps: "10 mins", rest_sec: 0 }
+      ]
+    })),
+    nutrition_plan: Array.from({ length: 7 }, (_, i) => ({
+      day: i + 1,
+      meals: [
+        { type: "Breakfast", description: "Oatmeal with protein powder and berries", calories: 450 },
+        { type: "Lunch", description: "Grilled chicken salad with olive oil dressing", calories: 650 },
+        { type: "Dinner", description: "Baked salmon with quinoa and roasted vegetables", calories: 800 },
+        { type: "Snack", description: "Greek yogurt with almonds", calories: 300 }
+      ]
+    }))
+  };
 }
