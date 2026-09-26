@@ -67,3 +67,17 @@ export const chatWithCoach = async (message: string) => {
     body: JSON.stringify({ message }),
   });
 };
+
+export const registerViaAdmin = async (email: string, password: string) => {
+  const response = await fetch(`${API_BASE}/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+  
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || `API Error: ${response.statusText}`);
+  }
+  return response.json();
+};

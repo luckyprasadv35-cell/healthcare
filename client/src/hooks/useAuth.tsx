@@ -60,7 +60,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signUp = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    // 1. Create user via backend to bypass Supabase email limits and auto-confirm
+    const { registerViaAdmin } = await import('../lib/api');
+    await registerViaAdmin(email, password);
+    
+    // 2. Immediately sign them in
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
     return data;
   };
