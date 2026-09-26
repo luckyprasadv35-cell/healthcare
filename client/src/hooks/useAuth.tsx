@@ -24,11 +24,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const checkProfileStatus = async () => {
     try {
+      setLoading(true);
       const response = await syncAuth();
       setHasProfile(response.exists === true);
     } catch (error) {
       console.error('Failed to sync auth/profile status:', error);
       setHasProfile(false);
+    } finally {
+      setLoading(false);
     }
   };
 

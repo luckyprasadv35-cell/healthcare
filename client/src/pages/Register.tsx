@@ -9,7 +9,7 @@ const Register: React.FC = () => {
 
   const handleRegister = async (data: any) => {
     await signUp(data.email, data.password);
-    navigate('/onboarding');
+    // Navigation is handled automatically by AuthProvider and ProtectedRoute
   };
 
   return (

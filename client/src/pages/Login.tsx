@@ -8,12 +8,8 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
 
   const handleLogin = async (data: any) => {
+    // Just call signIn, the AuthProvider and AppRoutes will handle redirection based on profile status
     await signIn(data.email, data.password);
-    if (hasProfile) {
-      navigate('/dashboard');
-    } else {
-      navigate('/onboarding');
-    }
   };
 
   return (
