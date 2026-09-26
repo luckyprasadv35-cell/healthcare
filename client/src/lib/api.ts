@@ -60,3 +60,10 @@ export const logProgress = async (data: { weight_kg: number; notes?: string }) =
 export const getProgressHistory = async () => {
   return fetchWithAuth('/progress/history');
 };
+
+export const chatWithCoach = async (message: string) => {
+  return fetchWithAuth('/chat', {
+    method: 'POST',
+    body: JSON.stringify({ message }),
+  });
+};

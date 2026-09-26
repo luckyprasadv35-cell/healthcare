@@ -2,6 +2,7 @@ import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { Activity } from 'lucide-react';
+import AICoachWidget from './AICoachWidget';
 
 const ProtectedRoute: React.FC = () => {
   const { session, loading, hasProfile } = useAuth();
@@ -24,7 +25,12 @@ const ProtectedRoute: React.FC = () => {
     return <Navigate to="/onboarding" replace />;
   }
 
-  return <Outlet />;
+  return (
+    <>
+      <Outlet />
+      {hasProfile && <AICoachWidget />}
+    </>
+  );
 };
 
 export default ProtectedRoute;
