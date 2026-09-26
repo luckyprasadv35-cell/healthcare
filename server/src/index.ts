@@ -20,6 +20,10 @@ app.use(express.json({ limit: '1mb' }));
 // Routes
 app.use('/api', routes);
 
+// Initialize Background Cron Jobs
+import { startCronJobs } from './jobs/cronJobs';
+startCronJobs();
+
 // Global Error Handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error('Global Error Handler:', err);
