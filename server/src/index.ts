@@ -9,7 +9,10 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: function (origin, callback) {
+    // Allow all origins (useful for Vercel deployments where the URL changes)
+    callback(null, true);
+  },
   credentials: true
 }));
 app.use(express.json({ limit: '1mb' }));
