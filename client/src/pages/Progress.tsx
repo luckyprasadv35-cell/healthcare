@@ -7,6 +7,7 @@ import { usePlan } from '../hooks/usePlan';
 import AdvisoryBanner from '../components/AdvisoryBanner';
 import { Activity, Plus, TrendingDown } from 'lucide-react';
 import { z } from 'zod';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 
 type FormData = z.infer<typeof ProgressLogSchema>;
 
@@ -117,25 +118,40 @@ const Progress: React.FC = () => {
               {loading ? (
                 <div className="flex justify-center py-10"><Activity className="h-8 w-8 text-gray-500 animate-pulse" /></div>
               ) : history.length > 0 ? (
-                <div className="overflow-hidden rounded-lg border border-gray-800">
-                  <table className="w-full text-sm text-left text-gray-300">
-                    <thead className="text-xs text-gray-500 uppercase bg-gray-950">
-                      <tr>
-                        <th className="px-4 py-3">Date</th>
-                        <th className="px-4 py-3">Weight</th>
-                        <th className="px-4 py-3">Notes</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-800">
-                      {history.map((entry, idx) => (
-                        <tr key={entry.id || idx} className="bg-gray-900 hover:bg-gray-800/50">
-                          <td className="px-4 py-3 whitespace-nowrap">{new Date(entry.log_date || entry.created_at).toLocaleDateString()}</td>
-                          <td className="px-4 py-3 font-medium text-emerald-400">{entry.weight_kg} kg</td>
-                          <td className="px-4 py-3 text-gray-400 truncate max-w-xs">{entry.notes || '-'}</td>
+                <div className="space-y-6">
+                  {/* Weight Progress Chart */}
+                  <div className="bg-gray-950 p-4 rounded-xl border border-gray-800" style={{ height: '250px' }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={[...history].reverse().map(h => ({ date: new Date(h.log_date || h.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }), weight: h.weight_kg }))} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" vertical={false} />
+                        <XAxis dataKey="date" stroke="#4b5563" fontSize={12} tickLine={false} axisLine={false} />
+                        <YAxis domain={['auto', 'auto']} stroke="#4b5563" fontSize={12} tickLine={false} axisLine={false} />
+                        <Tooltip contentStyle={{ backgroundColor: '#111827', borderColor: '#374151', borderRadius: '0.5rem', color: '#fff' }} itemStyle={{ color: '#10b981' }} />
+                        <Line type="monotone" dataKey="weight" stroke="#10b981" strokeWidth={3} dot={{ fill: '#10b981', strokeWidth: 2 }} activeDot={{ r: 6, fill: '#06b6d4' }} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  <div className="overflow-hidden rounded-lg border border-gray-800">
+                    <table className="w-full text-sm text-left text-gray-300">
+                      <thead className="text-xs text-gray-500 uppercase bg-gray-950">
+                        <tr>
+                          <th className="px-4 py-3">Date</th>
+                          <th className="px-4 py-3">Weight</th>
+                          <th className="px-4 py-3">Notes</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody className="divide-y divide-gray-800">
+                        {history.map((entry, idx) => (
+                          <tr key={entry.id || idx} className="bg-gray-900 hover:bg-gray-800/50">
+                            <td className="px-4 py-3 whitespace-nowrap">{new Date(entry.log_date || entry.created_at).toLocaleDateString()}</td>
+                            <td className="px-4 py-3 font-medium text-emerald-400">{entry.weight_kg} kg</td>
+                            <td className="px-4 py-3 text-gray-400 truncate max-w-xs">{entry.notes || '-'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               ) : (
                 <div className="text-center py-10 text-gray-500 bg-gray-950/50 rounded-lg border border-gray-800/50">
