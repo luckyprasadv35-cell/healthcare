@@ -69,35 +69,47 @@ Return ONLY a JSON object matching this exact structure:
   ]
 }`;
 
+  const MODELS_TO_TRY = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-3.8-flash'];
   let lastError: Error | null = null;
 
-  for (let attempt = 1; attempt <= 2; attempt++) {
-    try {
-      const prompt = attempt === 1 
-        ? userPrompt 
-        : `${userPrompt}\n\nIMPORTANT: Your previous output failed Zod schema validation. You MUST produce a JSON object with 'macros', 'workout_plan' (array of 7 days), and 'nutrition_plan' (array of 7 days). No markdown, no explanations outside JSON.`;
+  for (const model of MODELS_TO_TRY) {
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      try {
+        const prompt = attempt === 1 
+          ? userPrompt 
+          : `${userPrompt}\n\nIMPORTANT: Your previous output failed Zod schema validation. You MUST produce a JSON object with 'macros', 'workout_plan' (array of 7 days), and 'nutrition_plan' (array of 7 days). No markdown, no explanations outside JSON.`;
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.8-flash',
-        contents: prompt,
-        config: {
-          systemInstruction,
-          temperature: 0.2,
-        },
-      });
+        console.log(`Attempting plan generation with model: ${model} (attempt ${attempt})`);
+        
+        const response = await ai.models.generateContent({
+          model,
+          contents: prompt,
+          config: {
+            systemInstruction,
+            temperature: 0.2,
+          },
+        });
 
-      let text = response.text || '';
-      text = text.replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/\s*```$/, '').trim();
+        let text = response.text || '';
+        text = text.replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/\s*```$/, '').trim();
 
-      const parsedJson = JSON.parse(text);
-      const validatedPlan = AIPlanSchema.parse(parsedJson);
+        const parsedJson = JSON.parse(text);
+        const validatedPlan = AIPlanSchema.parse(parsedJson);
 
-      return validatedPlan;
-    } catch (error) {
-      console.error(`Gemini plan generation attempt ${attempt} failed:`, error);
-      lastError = error as Error;
+        return validatedPlan;
+      } catch (error: any) {
+        console.error(`Gemini model ${model} (attempt ${attempt}) failed:`, error?.message || error);
+        lastError = error as Error;
+
+        // If it's a 503 high demand or 404 model unavailable, break out of this model's attempts and try the next model immediately
+        const errString = JSON.stringify(error || '');
+        if (errString.includes('503') || errString.includes('UNAVAILABLE') || errString.includes('404') || errString.includes('NOT_FOUND')) {
+          console.warn(`Model ${model} unavailable or overloaded. Switching to fallback model...`);
+          break;
+        }
+      }
     }
   }
 
-  throw new Error(`Failed to generate valid plan after 2 attempts. ${lastError?.message || ''}`);
+  throw new Error(`All AI model attempts failed. ${lastError?.message || ''}`);
 }
